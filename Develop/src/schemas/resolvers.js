@@ -43,12 +43,12 @@ const resolvers = {
                 throw new AuthenticationError('Your account cannot be created at this time.');
             }
         },
-        saveBook: async (parent, { bookData }, context) => {
+        saveBook: async (parent, { Book }, context) => {
             if (context.user) {
                 try {
                     const updatedUser = await User.findOneAndUpdate(
                         { _id: context.user._id },
-                        { $addToSet: { savedBooks: bookData } },
+                        { $addToSet: { savedBooks: Book } },
                         { new: true }
                     );
                     return updatedUser;
