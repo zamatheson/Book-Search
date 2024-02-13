@@ -12,32 +12,30 @@ const db = require('./config/connection');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// import routes
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: authMiddleware,
-});
+async function startServer() {
+  // create ApolloServer instance
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: authMiddleware,
+  });
 
-// integrate the apollo server with the express application as middleware
-server.applyMiddleware({ app });
+  await server.start(); // Ensure server is started before applying middleware
 
-// middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+  // integrate the ApolloServer with the express application as middleware
+  server.applyMiddleware({ app });
 
-const __dirname = path.dirname('');
-const buildPath = path.join(__dirname, '../client/build');
-app.use(express.static(buildPath));
-// if we're in production, serve client/build as static assets
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  // middleware
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json());
+
+  // serve static assets
+  const buildPath = path.join(__dirname, '../client/build');
+  app.use(express.static(buildPath));
+
+  db.once('open', () => {
+    app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
+  });
 }
 
-app.use(routes);
-
-db.once('open', () => {
-  app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
-});
-
-startApolloServer(typeDefs, resolvers);
+startServer();
