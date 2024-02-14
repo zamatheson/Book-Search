@@ -1,1 +1,2 @@
 # Book Search Engine Starter Code
+This is a MERN stack application which uses Google Books API to search and save different book titles. This application has a user login function which allows users to save and document a wishlist of books. Each book has an image, title, author and description!
